@@ -1,6 +1,5 @@
 # Algorithm-design-and-analysis
-计算机算法的学习和练习
-Karatsuba算法
+
 原大整数乘法代码的相乘部分代码是根据公式![image](https://user-images.githubusercontent.com/77910684/160176776-b4fc0ec5-1680-4d74-abed-c68faaf60d02.png)
 进行计算的，需要进行四次乘法，其时间复杂度为![image](https://user-images.githubusercontent.com/77910684/160176842-6a1a477a-a12e-4312-bc50-0e6b2142f09b.png)
 。而公式![image](https://user-images.githubusercontent.com/77910684/160176892-0a8c5483-7715-4453-9480-732bcbe565d4.png)
