@@ -1,153 +1,99 @@
 #include<iostream>
 #include<string>
-
+#include<set>
 using namespace std;
-string get_longest_subsequence(string s1,string s2);
-void maximum_common_subsequence(string s, int** direction_matrix, int rows, int cols, string& result);
 
+//获得所有最长子序列
+void get_all_longest_commen_subsequence(string s1,string s2,int** value_matrix, int rows,int cols, string &result);
+//反转序列
+string reverse(string s);
+
+set<string>sequence;
 int main()
 {
-	//string s1 = "BDCABA", s2 = "ABCBDAB";
+	int** value_matrix = nullptr;
 	string s1, s2;
-	cout << "请输入两个字符串" << endl;
+	cout << "请输入两个序列：" << endl;
 	cin >> s1 >> s2;
 
-	string result_1 = get_longest_subsequence(s1, s2);
-	string result_2 = get_longest_subsequence(s2, s1);
+	//获取数组的行、列
+	int rows = s1.length() + 1;
+	int cols = s2.length() + 1;
 
-	if (result_1.length() == result_2.length())
+	//进行二维数组的内存申请并进行相应计算
+	value_matrix = new int* [rows];
+	for (int i = 0; i < rows; i++)
 	{
-		if (result_1 == result_2)
+		value_matrix[i] = new int[cols];
+	}
+	for (int i = 0; i < rows; i++)
+		for (int j = 0; j < cols; j++)
 		{
-			cout << "最长公共子序列为：" << result_1 << endl;
-		}
-		else
-		{
-			cout << "最长公共子序列为：" << result_1 << "、" << result_2 << endl;
-		}
-	}
-	else if (result_1.length() > result_2.length())
-	{
-		cout << "最长公共子序列为：" << result_1 << endl;
-	}
-	else
-	{
-		cout << "最长公共子序列为：" << result_2 << endl;
-	}
+			if (i == 0 || j == 0)
+				value_matrix[i][j] = 0;
 
+			else if (s1[i - 1] == s2[j - 1])
+				value_matrix[i][j] = value_matrix[i - 1][j - 1] + 1;
+
+			else
+				value_matrix[i][j] = value_matrix[i - 1][j] > value_matrix[i][j - 1] ? value_matrix[i - 1][j] : value_matrix[i][j - 1];
+		}
+	cout << endl;
+	cout << "所有最长公共子序列为：" << endl;
+	string result;
+	get_all_longest_commen_subsequence(s1, s2, value_matrix, rows - 1, cols - 1, result);
+	
+	for (set<string>::iterator result = sequence.begin(); result != sequence.end(); result++)
+		cout << *result << endl;
+	
+	//释放指针
+	delete[] value_matrix;
 	return 0;
 }
 	
 
-string get_longest_subsequence(string s1, string s2)
+void get_all_longest_commen_subsequence(string s1, string s2, int** value_matrix, int rows, int cols, string &result)
 {
-	int** value_matrix = nullptr, ** direction_matrix = nullptr;
-	//获取数组的行、列
-	int cols = s1.length() + 1;
-	int rows = s2.length() + 1;
+	string temp;
 
-	//进行两个二维数组的内存申请
-	value_matrix = new int* [rows];
-	direction_matrix = new int* [rows];
-
-	for (int i = 0; i < rows; i++)
+	for (int i = rows, j = cols; i != 0 && j != 0; ) 
 	{
-		value_matrix[i] = new int[cols];
-		direction_matrix[i] = new int[cols];
-	}
-
-	//对方向数组进行赋值
-	for (int i = 0; i < rows; i++)
-		for (int j = 0; j < cols; j++)
+		//如果两个序列对对应的元素相等，则各往前进一个元素，否则直接结束函数
+		if (s1[i - 1] == s2[j - 1])
 		{
-			direction_matrix[i][j] = 0;
-			value_matrix[i][j] = 0;
+			result+=s1[i - 1];
+			i--;
+			j--;
 		}
-			
-
-	//进行对应计算
-	for (int i = 1; i < rows; i++)
-		for (int j = 1; j < cols; j++)
+		else 
 		{
-			if (s1[j - 1] == s2[i - 1])
+			if (value_matrix[i - 1][j] == value_matrix[i][j]) 
 			{
-				value_matrix[i][j] = value_matrix[i - 1][j - 1] + 1;
-				direction_matrix[i][j] = 1;
+				temp = result;
+				get_all_longest_commen_subsequence(s1, s2, value_matrix, i-1, j, result);
+				result = temp;
 			}
-			else if (value_matrix[i - 1][j] >= value_matrix[i][j - 1])
+			if (value_matrix[i][j - 1] == value_matrix[i][j]) 
 			{
-				value_matrix[i][j] = value_matrix[i - 1][j];
-				direction_matrix[i][j] = 2;
+				temp = result;
+				get_all_longest_commen_subsequence(s1, s2, value_matrix, i, j-1, result);
+				result = temp;
 			}
-			else
-			{
-				value_matrix[i][j] = value_matrix[i][j - 1];
-				direction_matrix[i][j] = 3;
-			}
+			return;
 		}
-
-	//对结果进行显示
-	for (int i = 0; i < rows; i++)
-	{
-		for (int j = 0; j < cols; j++)
-		{
-			cout << value_matrix[i][j] << " ";
-		}
-		cout << endl;
 	}
-	cout << "--------------------------------------------------" << endl;
-
-	for (int i = 0; i < rows; i++)
-	{
-		for (int j = 0; j < cols; j++)
-		{
-			cout << direction_matrix[i][j] << " ";
-		}
-		cout << endl;
-	}
-	cout << "--------------------------------------------------" << endl;
-
-	//用result获取结果
-	string result;
-	maximum_common_subsequence(s1, direction_matrix, rows - 1, cols - 1, result);
-
-	int result_length = result.length();
-	string temp = result;
-	for (int i = 0; i < result_length; i++)
-	{
-		result[i] = temp[result_length - 1 - i];
-	}
-	
-	//释放指针
-	delete[] value_matrix;
-	delete[] direction_matrix;
-
-	return result;
+	sequence.insert(reverse(result));
 }
 
-
-
-//寻找最长公共子序列
 /*
-* 参数：进行比较的两个字符串中一个、符号数组、符号数组长度、符号数组宽度、用来保存最大公共子序列倒序的字符
+*反转序列
 */
-void maximum_common_subsequence(string s, int** direction_matrix, int rows, int cols, string& result)
+string reverse(string s)
 {
-	//如果寻找到了第一行/列，则退出
-	if (rows == 0 || cols == 0)
-		return;
-	//如果是相同的则输出
-	if (direction_matrix[rows][cols] == 1)
+	string result;
+	for (int i = 0; i < s.length(); i++)
 	{
-		result+= s[cols - 1];
-		maximum_common_subsequence(s, direction_matrix, rows - 1, cols - 1, result);
+		result += s[s.length() - 1 - i];
 	}
-	else if (direction_matrix[rows][cols] == 2)
-	{
-		maximum_common_subsequence(s, direction_matrix, rows - 1, cols, result);
-	}
-	else
-	{
-		maximum_common_subsequence(s, direction_matrix, rows, cols - 1, result);
-	}
+	return result;
 }
