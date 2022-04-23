@@ -56,18 +56,15 @@ int main()
 	}
 	for (int i = number; i >1; i--)
 	{
-		if (Prize[i][count] == Prize[i - 1][count])
+		if (Prize[i][count] != Prize[i - 1][count])
 		{
-			cout << "未选取商品：" << i << endl;
-		}
-		else
-		{
-			count -= volume[i-1];
+			count -= volume[i - 1];
+			cout << "选取商品：" << i << endl;
 		}
 	}
-	if (Prize[1][count] == 0)
+	if (Prize[1][count] != 0)
 	{
-		cout << "未选取商品：" << 1 << endl;
+		cout << "选取商品：" << 1 << endl;
 	}
 	return 0;
 }
