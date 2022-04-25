@@ -44,27 +44,38 @@ int main()
 	{
 		for (int j = 1; j <= count; j++)
 		{
+			//如果体积小于j即背包中可以装下
 			if (volume[i-1] <= j)
 			{
-				Prize[i][j] = (value[i-1] + Prize[i-1][j - volume[i-1]]>Prize[i-1][j]? value[i-1] + Prize[i - 1][j - volume[i-1]] : Prize[i - 1][j]);
+				//获得装下和不装下的情况最大的值
+				Prize[i][j] = (value[i-1] + Prize[i-1][j - volume[i-1]]>Prize[i-1][j] ? value[i-1] + Prize[i - 1][j - volume[i-1]] : Prize[i - 1][j]);
 			}
+			//背包中装不下
 			else 
 			{
 				Prize[i][j] = Prize[i-1][j];
 			}
 		}
 	}
-	for (int i = number; i >1; i--)
+	
+	int temp = count;
+	//从后向前根据关系进行输出
+	for (int i = number; i >0; i--)
 	{
-		if (Prize[i][count] != Prize[i - 1][count])
+		//如果不相等则说明第i个物品是装进背包的
+		if (Prize[i][temp] != Prize[i - 1][temp])
 		{
-			count -= volume[i - 1];
+			temp -= volume[i - 1];
 			cout << "选取商品：" << i << endl;
 		}
 	}
-	if (Prize[1][count] != 0)
+	cout << "选取的商品总价值为：" << Prize[number][count] << endl;
+	
+	//释放空间
+	for (int i = 0; i <= number; i++)
 	{
-		cout << "选取商品：" << 1 << endl;
+		delete Prize[i];
 	}
+	delete []Prize;
 	return 0;
 }
